@@ -84,11 +84,15 @@
     fetchAndRender();
 
     function  fetchAndRender() {
-      const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+      buttonElement.disabled = true;
+      buttonElement.textContent = 'Подождите';
+      return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
         method: "GET"
-      });
-      fetchPromise.then((response) => {
-      response.json().then((responseData) => {
+      })
+      .then((response) => {
+        return response.json()
+      })
+      .then((responseData) => {
         const appComments = responseData.comments.map((comment) => {
           return {
             name: comment.author.name,
@@ -98,12 +102,13 @@
             isLiked: false,
           }
         })
-
         comments = appComments;
         renderComments();
-        
-      });
-    });
+      })
+      .then((data) => {
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать'; 
+      })
     }
     
     // Фукнция рендера комментариев
@@ -225,21 +230,28 @@
           isLiked: false,
         });
       } else {
+        buttonElement.disabled = true;
+        buttonElement.textContent = 'Подождите';
         const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
           method: "POST", 
           body: JSON.stringify({
-            name: nameInputElement.value,
+            name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
             date: new Date().toLocaleString(),
-            text: commentInput.value,
+            text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
             likes: '',
             isLiked: false, 
           }) 
         })
-        fetchPromise.then((response) => {
-          response.json().then((responseData) => {
-            fetchAndRender();
-          });
-        });
+        .then((response) => {
+          return response.json()
+        })
+        .then((responseData) => {
+          return fetchAndRender();
+        })
+        .then((data) => {
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать'; 
+        })
       };
       nameInputElement.value = '';
       commentInput.value = '';     
