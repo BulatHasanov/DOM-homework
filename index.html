@@ -9,10 +9,10 @@
   <body>
     <div class="container">
       <ul id="comment-list" class="comments">
-        <li class="comment">
+        <!-- <li class="comment">
           <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
+            <div class="Name">Глеб Фокин</div>
+            <div class="commentDate">12.02.22 12:18</div>
           </div>
           <div class="comment-body">
             <div class="comment-text">
@@ -42,7 +42,7 @@
               <button class="like-button -active-like"></button>
             </div>
           </div>
-        </li>
+        </li> -->
       </ul>
       <div class="add-form">
         <input
@@ -77,34 +77,134 @@
     const nameInputElement = document.getElementById("add-name");
     const commentInput = document.getElementById("add-text");
     let likeValue = document.getElementById('likesCounter');
-    likeValue.value = '0';
 
+    let comments = [];
+    let appComments = [];
+    initLikesButtonListeners();
+    fetchAndRender();
+
+    function  fetchAndRender() {
+      const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+        method: "GET"
+      });
+      fetchPromise.then((response) => {
+      response.json().then((responseData) => {
+        const appComments = responseData.comments.map((comment) => {
+          return {
+            name: comment.author.name,
+            date: new Date(comment.date).toLocaleString(),
+            text: comment.text,
+            likes: comment.likes,
+            isLiked: false,
+          }
+        })
+
+        comments = appComments;
+        renderComments();
+        
+      });
+    });
+    }
+    
+    // Фукнция рендера комментариев
+    const renderComments = () => {
+      const usersHTML = comments.map((comment, index) => {
+        return `
+          <li data-index="${index}" class="comment">
+            <div class="comment-header">
+              <div>${comment.name}</div>
+              <div>${comment.date}</div>
+            </div>
+            <div class="comment-body">
+              <div style="white-space: pre-line" class="comment-text">
+                ${comment.text}
+              </div>
+            </div>
+            <div class="comment-footer">
+              <div class="likes">
+                <span class="likes-counter">${comment.likes}</span>
+                <button class="like-button ${comment.isLiked ? '-active-like' : ''}" data-index="${index}"></button>
+              </div>
+            </div>
+          </li>`;
+      }).join("");
+      listElement.innerHTML = usersHTML;
+      initCommentAnswers();
+      initLikesButtonListeners();
+    }
+    
+    // Функция для проставления лайков
+    function initLikesButtonListeners() {
+      const likeButtons = document.querySelectorAll('.like-button');
+
+      for (const likeButton of likeButtons) {
+        likeButton.addEventListener("click", (event) => {
+          const index = parseInt(likeButton.getAttribute('data-index'));
+          comments[index].isLiked = !comments[index].isLiked;
+
+          if (comments[index].isLiked) {
+            comments[index].likes += 1;
+          } else {
+            comments[index].likes -= 1;
+          }
+          event.stopPropagation();
+          renderComments();
+        });
+      }
+    };
+
+    // Функция для поиска индекса комментария в массиве
+    function findCommentIndex(replyText) {
+      const repliedCommentName = replyText.substring(1, replyText.indexOf(',')); // Получаем имя комментатора из строки ответа
+      return comments.findIndex(comment => comment.name === repliedCommentName);
+    }
+    // Отрисовка для ответов на комментарии
+    const initCommentAnswers = () => {
+      const commentsList = document.querySelectorAll('.comment');
+
+      for (const comment of commentsList) {
+          comment.addEventListener("click", (event) => {
+            const index = parseInt(comment.getAttribute('data-index'));
+            const selectedComment = comments[index];
+            commentInput.value =
+            `>${selectedComment.text}
+            
+            ${selectedComment.name}`;
+
+            event.stopPropagation();
+          });
+      }
+    }
+
+
+    // Код для добавления комментария
     buttonElement.addEventListener("click", () => {
       nameInputElement.classList.remove('error');
       commentInput.classList.remove('error');
 
-      if((nameInputElement.value === '') && (commentInput.value === '')) {
+      if ((nameInputElement.value === '') && (commentInput.value === '')) {
         nameInputElement.classList.add('error');
         commentInput.classList.add('error');
-        return
-      }else if(commentInput.value === '') {
+        return;
+      } else if (commentInput.value === '') {
         commentInput.classList.add('error');
-        return
-      } else if(nameInputElement.value === ''){
+        return;
+      } else if (nameInputElement.value === '') {
         nameInputElement.classList.add('error');
-        return
+        return;
       }
+
       const nowDate = new Date();
       let dayNumb = nowDate.getDate();
       let monthNumb = nowDate.getMonth();
       let year = Math.abs(2000 - nowDate.getFullYear());
-      if(dayNumb < 10){
+      if (dayNumb < 10) {
         dayNumb = "0" + dayNumb
       }
-      if(monthNumb < 10){
+      if (monthNumb < 10) {
         monthNumb = "0" + monthNumb
       };
-      const fullDate =  dayNumb + "." + monthNumb + "." + year;
+      const fullDate = dayNumb + "." + monthNumb + "." + year;
       let hour = nowDate.getHours(); 
       let minute = nowDate.getMinutes(); 
       if (minute < 10) {
@@ -112,28 +212,41 @@
       };
       const time = hour + ":" + minute;
       const oldListHtml = listElement.innerHTML;
-      listElement.innerHTML = oldListHtml + 
-        `<li class="comment">
-          <div class="comment-header">
-            <div>${nameInputElement.value}</div>
-            <div>${fullDate} ${time}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${commentInput.value}
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${likeValue.value}</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>`
+
+      const isReply = commentInput.value.startsWith('@');
+      const repliedCommentIndex = isReply ? findCommentIndex(commentInput.value) : -1;
+      if (isReply && repliedCommentIndex !== -1) {
+        comments[repliedCommentIndex].replies.push({
+          name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+          fullDate: fullDate,
+          time: time,
+          commentText: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+          likesCounter: 0,
+          isLiked: false,
+        });
+      } else {
+        const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+          method: "POST", 
+          body: JSON.stringify({
+            name: nameInputElement.value,
+            date: new Date().toLocaleString(),
+            text: commentInput.value,
+            likes: '',
+            isLiked: false, 
+          }) 
+        })
+        fetchPromise.then((response) => {
+          response.json().then((responseData) => {
+            fetchAndRender();
+          });
+        });
+      };
       nameInputElement.value = '';
-      commentInput.value = '';
+      commentInput.value = '';     
+
     })    
-    
+
+    renderComments();
     console.log("It works!");
   </script>
 </html>
