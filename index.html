@@ -44,7 +44,8 @@
           </div>
         </li> -->
       </ul>
-      <div class="add-form">
+      <div id="loader">Загрузка комментариев...</div>
+      <div class="add-form" >
         <input
           id="add-name"
           type="text"
@@ -70,6 +71,14 @@
     .error{
       background-color: #FFA07A;
     }
+    .loader{
+      display: none;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      
+    }
   </style>
   <script>
     const buttonElement = document.getElementById("add-button");
@@ -81,11 +90,12 @@
     let comments = [];
     let appComments = [];
     initLikesButtonListeners();
-    fetchAndRender();
+    fetchLoading();
 
     function  fetchAndRender() {
       buttonElement.disabled = true;
       buttonElement.textContent = 'Подождите';
+      
       return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
         method: "GET"
       })
@@ -103,11 +113,47 @@
           }
         })
         comments = appComments;
-        renderComments();
       })
       .then((data) => {
-          buttonElement.disabled = false;
-          buttonElement.textContent = 'Написать'; 
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Написать'; 
+        renderComments();
+      })
+    }
+    function  fetchLoading() {
+      const loader = document.getElementById('loader');
+      loader.style.display = 'block';
+      buttonElement.disabled = true;
+      buttonElement.textContent = 'Подождите';
+
+      nameInputElement.disabled = true;
+      commentInput.disabled = true;
+
+      return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+        method: "GET"
+      })
+      .then((response) => {
+        return response.json()
+      })
+      .then((responseData) => {
+        const appComments = responseData.comments.map((comment) => {
+          return {
+            name: comment.author.name,
+            date: new Date(comment.date).toLocaleString(),
+            text: comment.text,
+            likes: comment.likes,
+            isLiked: false,
+          }
+        })
+        comments = appComments;
+      })
+      .then((data) => {
+        loader.style.display = 'none';
+        nameInputElement.disabled = false;
+        commentInput.disabled = false;
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Написать'; 
+        renderComments();
       })
     }
     
