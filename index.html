@@ -110,6 +110,7 @@
             text: comment.text,
             likes: comment.likes,
             isLiked: false,
+            forceError: true,
           }
         })
         comments = appComments;
@@ -143,6 +144,7 @@
             text: comment.text,
             likes: comment.likes,
             isLiked: false,
+            forceError: true,
           }
         })
         comments = appComments;
@@ -286,22 +288,35 @@
             text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
             likes: '',
             isLiked: false, 
+            forceError: true,
           }) 
         })
         .then((response) => {
-          return response.json()
+          if(response.status === 201) {
+            return response.json()
+          } else if (response.status === 400) {
+            alert('Имя и комметарий должен иметь больше 3-х символов');
+            throw new Error('Короткое имя или комментарий');
+          } else {
+            throw new Error('Сервер упал');
+          }
         })
         .then((responseData) => {
-          return fetchAndRender();
+            return fetchAndRender();
         })
         .then((data) => {
           buttonElement.disabled = false;
-          buttonElement.textContent = 'Написать'; 
+          buttonElement.textContent = 'Написать';
+          nameInputElement.value = '';
+          commentInput.value = '';
         })
-      };
-      nameInputElement.value = '';
-      commentInput.value = '';     
-
+        .catch((error) => {
+          alert("Кажется что-то пошло не так");
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать';
+          console.warn(error);
+        })
+      };   
     })    
 
     renderComments();
