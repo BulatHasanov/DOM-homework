@@ -328,7 +328,7 @@
             forceError: true,
           }) 
         })
-        .then((response) => {
+        .then((response) => { 
           if(response.status === 201) {
             return response.json()
           } else if (response.status === 400) {
