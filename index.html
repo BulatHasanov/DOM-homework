@@ -86,15 +86,42 @@
     const nameInputElement = document.getElementById("add-name");
     const commentInput = document.getElementById("add-text");
     let likeValue = document.getElementById('likesCounter');
+    let isOnline = navigator.onLine;
 
     let comments = [];
     let appComments = [];
     initLikesButtonListeners();
     fetchLoading();
+    
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
+    function handleOffline() {
+      isOnline = false;
+      alert("Отсутствует интернет");
+    }
+
+    function handleOnline() {
+      isOnline = true;
+      alert("Подключение восстановлено");
+      fetchLoading();
+    }
+
+    function handleFetchError(error) {
+      if(error.message === 'Короткое имя или комментарий') {
+        alert('Имя и комметарий должен иметь больше 3-х символов');
+      } else if (error.message === 'Сервер упал') {
+        alert("Нет ответа от сервера");
+      } else if (error.message === 'Отсутствует интернет') {
+        alert("Отсутствует интернет");       
+      } 
+      buttonElement.disabled = false;
+      buttonElement.textContent = 'Написать';
+    }
     function  fetchAndRender() {
       buttonElement.disabled = true;
       buttonElement.textContent = 'Подождите';
+      
       
       return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
         method: "GET"
@@ -119,7 +146,6 @@
         buttonElement.disabled = false;
         buttonElement.textContent = 'Написать'; 
         renderComments();
-        
       })
     }
     function  fetchLoading() {
@@ -158,6 +184,11 @@
         buttonElement.textContent = 'Написать'; 
         renderComments();
       })
+      .catch((error) => {
+          handleFetchError(error);
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать';
+        })
     }
     
     // Фукнция рендера комментариев
@@ -236,6 +267,11 @@
       nameInputElement.classList.remove('error');
       commentInput.classList.remove('error');
 
+      if (!isOnline) {
+        alert("Отсутствует интернет. Пожалуйста, проверьте ваше соединение и повторите попытку.");
+        return;
+      }
+
       if ((nameInputElement.value === '') && (commentInput.value === '')) {
         nameInputElement.classList.add('error');
         commentInput.classList.add('error');
@@ -296,10 +332,11 @@
           if(response.status === 201) {
             return response.json()
           } else if (response.status === 400) {
-            alert('Имя и комметарий должен иметь больше 3-х символов');
             throw new Error('Короткое имя или комментарий');
-          } else {
+          } else if (response.status === 500) {
             throw new Error('Сервер упал');
+          } else if(!response.ok) {
+            throw new Error('Отсутствует интернет');
           }
         })
         .then((responseData) => {
@@ -312,10 +349,9 @@
           commentInput.value = '';
         })
         .catch((error) => {
-          alert("Кажется что-то пошло не так");
+          handleFetchError(error);
           buttonElement.disabled = false;
           buttonElement.textContent = 'Написать';
-          console.warn(error);
         })
       };   
     })    
