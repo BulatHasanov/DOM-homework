@@ -1,3 +1,7 @@
+
+import {getComments, postComment} from "./api.js";
+import { renderComments } from "./render.js"
+
 const buttonElement = document.getElementById("add-button");
 const listElement = document.getElementById("comment-list");
 const nameInputElement = document.getElementById("add-name");
@@ -36,38 +40,6 @@ function handleFetchError(error) {
   buttonElement.textContent = 'Написать';
 }
 
-
-// function  fetchAndRender() {
-//   buttonElement.disabled = true;
-//   buttonElement.textContent = 'Подождите';
-  
-  
-//   return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
-//     method: "GET"
-//   })
-//   .then((response) => {
-//     return response.json()
-//   })
-//   .then((responseData) => {
-//     const appComments = responseData.comments.map((comment) => {
-//       return {
-//         name: comment.author.name,
-//         date: new Date(comment.date).toLocaleString(),
-//         text: comment.text,
-//         likes: comment.likes,
-//         isLiked: false,
-//         forceError: true,
-//       }
-//     })
-//     comments = appComments;
-//   })
-//   .then((data) => {
-//     buttonElement.disabled = false;
-//     buttonElement.textContent = 'Написать'; 
-//     renderComments();
-//   })
-// }
-
 function  fetchLoading() {
   const loader = document.getElementById('loader');
   loader.style.display = 'block';
@@ -81,18 +53,7 @@ function  fetchLoading() {
     alert("Отсутствует интернет. Пожалуйста, проверьте ваше соединение и повторите попытку.");
     return;
   }
-
-  return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
-    method: "GET"
-  })
-  .then((response) => {
-    if(response.status === 200) {
-        return response.json()
-      } else if (response.status === 500) {
-        throw new Error('Сервер упал');
-      } 
-  })
-  .then((responseData) => {
+  getComments().then((responseData) => {
     const appComments = responseData.comments.map((comment) => {
       return {
         name: comment.author.name,
@@ -111,7 +72,7 @@ function  fetchLoading() {
     commentInput.disabled = false;
     buttonElement.disabled = false;
     buttonElement.textContent = 'Написать'; 
-    renderComments();
+    renderComments({comments});
   })
   .catch((error) => {
       handleFetchError(error);
@@ -120,35 +81,8 @@ function  fetchLoading() {
     })
 }
 
-// Фукнция рендера комментариев
-const renderComments = () => {
-  const usersHTML = comments.map((comment, index) => {
-    return `
-      <li data-index="${index}" class="comment">
-        <div class="comment-header">
-          <div>${comment.name}</div>
-          <div>${comment.date}</div>
-        </div>
-        <div class="comment-body">
-          <div style="white-space: pre-line" class="comment-text">
-            ${comment.text}
-          </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">${comment.likes}</span>
-            <button class="like-button ${comment.isLiked ? '-active-like' : ''}" data-index="${index}"></button>
-          </div>
-        </div>
-      </li>`;
-  }).join("");
-  listElement.innerHTML = usersHTML;
-  initCommentAnswers();
-  initLikesButtonListeners();
-}
-
 // Функция для проставления лайков
-function initLikesButtonListeners() {
+export function initLikesButtonListeners() {
   const likeButtons = document.querySelectorAll('.like-button');
 
   for (const likeButton of likeButtons) {
@@ -162,7 +96,7 @@ function initLikesButtonListeners() {
         comments[index].likes -= 1;
       }
       event.stopPropagation();
-      renderComments();
+      renderComments({comments});
     });
   }
 };
@@ -173,7 +107,7 @@ function findCommentIndex(replyText) {
   return comments.findIndex(comment => comment.name === repliedCommentName);
 }
 // Отрисовка для ответов на комментарии
-const initCommentAnswers = () => {
+export const initCommentAnswers = () => {
   const commentsList = document.querySelectorAll('.comment');
 
   for (const comment of commentsList) {
@@ -246,27 +180,14 @@ buttonElement.addEventListener("click", () => {
   } else {
     buttonElement.disabled = true;
     buttonElement.textContent = 'Подождите';
-    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
-      method: "POST", 
-      body: JSON.stringify({
-        name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-        date: new Date().toLocaleString(),
-        text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-        likes: '',
-        isLiked: false, 
-        forceError: true,
-      }) 
-    })
-    .then((response) => { 
-      if(response.status === 201) {
-        return response.json()
-      } else if (response.status === 400) {
-        throw new Error('Короткое имя или комментарий');
-      } else if (response.status === 500) {
-        throw new Error('Сервер упал');
-      } 
-    })
-    .then((responseData) => {
+    const fetchPromise = postComment({
+      name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+      date: new Date().toLocaleString(),
+      text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+      likes: '',
+      isLiked: false, 
+      forceError: true,
+    }).then((responseData) => {
         return fetchLoading();
     })
     .then((data) => {
@@ -283,5 +204,5 @@ buttonElement.addEventListener("click", () => {
   };   
 })    
 
-renderComments();
+renderComments({comments});
 console.log("It works!");
