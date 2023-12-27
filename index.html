@@ -44,7 +44,8 @@
           </div>
         </li> -->
       </ul>
-      <div class="add-form">
+      <div id="loader">Загрузка комментариев...</div>
+      <div class="add-form" >
         <input
           id="add-name"
           type="text"
@@ -70,6 +71,14 @@
     .error{
       background-color: #FFA07A;
     }
+    .loader{
+      display: none;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      
+    }
   </style>
   <script>
     const buttonElement = document.getElementById("add-button");
@@ -77,18 +86,96 @@
     const nameInputElement = document.getElementById("add-name");
     const commentInput = document.getElementById("add-text");
     let likeValue = document.getElementById('likesCounter');
+    let isOnline = navigator.onLine;
 
     let comments = [];
     let appComments = [];
     initLikesButtonListeners();
-    fetchAndRender();
+    fetchLoading();
+    
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
-    function  fetchAndRender() {
-      const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+    function handleOffline() {
+      isOnline = false;
+      alert("Отсутствует интернет");
+    }
+
+    function handleOnline() {
+      isOnline = true;
+      alert("Подключение восстановлено");
+      fetchLoading();
+    }
+
+    function handleFetchError(error) {
+      if(error.message === 'Короткое имя или комментарий') {
+        alert('Имя и комметарий должен иметь больше 3-х символов');
+      } else if (error.message === 'Сервер упал') {
+        alert("Нет ответа от сервера");
+      } else if (error.message === 'Отсутствует интернет') {
+        alert("Отсутствует интернет");       
+      } 
+      buttonElement.disabled = false;
+      buttonElement.textContent = 'Написать';
+    }
+    
+    
+    // function  fetchAndRender() {
+    //   buttonElement.disabled = true;
+    //   buttonElement.textContent = 'Подождите';
+      
+      
+    //   return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+    //     method: "GET"
+    //   })
+    //   .then((response) => {
+    //     return response.json()
+    //   })
+    //   .then((responseData) => {
+    //     const appComments = responseData.comments.map((comment) => {
+    //       return {
+    //         name: comment.author.name,
+    //         date: new Date(comment.date).toLocaleString(),
+    //         text: comment.text,
+    //         likes: comment.likes,
+    //         isLiked: false,
+    //         forceError: true,
+    //       }
+    //     })
+    //     comments = appComments;
+    //   })
+    //   .then((data) => {
+    //     buttonElement.disabled = false;
+    //     buttonElement.textContent = 'Написать'; 
+    //     renderComments();
+    //   })
+    // }
+
+    function  fetchLoading() {
+      const loader = document.getElementById('loader');
+      loader.style.display = 'block';
+      buttonElement.disabled = true;
+      buttonElement.textContent = 'Подождите';
+
+      nameInputElement.disabled = true;
+      commentInput.disabled = true;
+
+      if (!isOnline) {
+        alert("Отсутствует интернет. Пожалуйста, проверьте ваше соединение и повторите попытку.");
+        return;
+      }
+
+      return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
         method: "GET"
-      });
-      fetchPromise.then((response) => {
-      response.json().then((responseData) => {
+      })
+      .then((response) => {
+        if(response.status === 200) {
+            return response.json()
+          } else if (response.status === 500) {
+            throw new Error('Сервер упал');
+          } 
+      })
+      .then((responseData) => {
         const appComments = responseData.comments.map((comment) => {
           return {
             name: comment.author.name,
@@ -96,14 +183,24 @@
             text: comment.text,
             likes: comment.likes,
             isLiked: false,
+            forceError: true,
           }
         })
-
         comments = appComments;
+      })
+      .then((data) => {
+        loader.style.display = 'none';
+        nameInputElement.disabled = false;
+        commentInput.disabled = false;
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Написать'; 
         renderComments();
-        
-      });
-    });
+      })
+      .catch((error) => {
+          handleFetchError(error);
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать';
+        })
     }
     
     // Фукнция рендера комментариев
@@ -182,6 +279,11 @@
       nameInputElement.classList.remove('error');
       commentInput.classList.remove('error');
 
+      if (!isOnline) {
+        alert("Отсутствует интернет. Пожалуйста, проверьте ваше соединение и повторите попытку.");
+        return;
+      }
+
       if ((nameInputElement.value === '') && (commentInput.value === '')) {
         nameInputElement.classList.add('error');
         commentInput.classList.add('error');
@@ -225,25 +327,43 @@
           isLiked: false,
         });
       } else {
+        buttonElement.disabled = true;
+        buttonElement.textContent = 'Подождите';
         const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
           method: "POST", 
           body: JSON.stringify({
-            name: nameInputElement.value,
+            name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
             date: new Date().toLocaleString(),
-            text: commentInput.value,
+            text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
             likes: '',
             isLiked: false, 
+            forceError: true,
           }) 
         })
-        fetchPromise.then((response) => {
-          response.json().then((responseData) => {
-            fetchAndRender();
-          });
-        });
-      };
-      nameInputElement.value = '';
-      commentInput.value = '';     
-
+        .then((response) => { 
+          if(response.status === 201) {
+            return response.json()
+          } else if (response.status === 400) {
+            throw new Error('Короткое имя или комментарий');
+          } else if (response.status === 500) {
+            throw new Error('Сервер упал');
+          } 
+        })
+        .then((responseData) => {
+            return fetchLoading();
+        })
+        .then((data) => {
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать';
+          nameInputElement.value = '';
+          commentInput.value = '';
+        })
+        .catch((error) => {
+          handleFetchError(error);
+          buttonElement.disabled = false;
+          buttonElement.textContent = 'Написать';
+        })
+      };   
     })    
 
     renderComments();
