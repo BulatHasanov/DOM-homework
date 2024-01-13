@@ -1,5 +1,8 @@
+
+const host = "https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments";
+
 export function  getComments() {
-    return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+    return fetch(host, {
     method: "GET"
   })
   .then((response) => {
@@ -12,7 +15,7 @@ export function  getComments() {
 }
 
 export function postComment({name, date, text, likes, isLiked, forceError }) {
-    return fetch("https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments", {
+    return fetch(host, {
         method: "POST", 
         body: JSON.stringify({
           name: name,
