@@ -76,6 +76,7 @@ export const renderComments = ({comments}) => {
             </div>
           </div>`
 
+          
     listElement.innerHTML = usersHTML;
     initCommentAnswers();
     initLikesButtonListeners();
