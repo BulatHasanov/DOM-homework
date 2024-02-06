@@ -1,5 +1,6 @@
 
 const host = "https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments";
+const loginHost = "https://wedev-api.sky.pro/api/user/login"
 
 export function  getComments() {
     return fetch(host, {
@@ -12,6 +13,20 @@ export function  getComments() {
         throw new Error('Сервер упал');
       } 
   })
+}
+
+export function fetchLogin(login, password) {
+  return fetch(loginHost, {
+    method: 'POST',
+    body: JSON.stringify(
+      {
+        login,
+        password,
+      })
+  })
+    .then((response) => {
+      return response.json();
+    })
 }
 
 export function postComment({name, date, text, likes, isLiked, forceError }) {

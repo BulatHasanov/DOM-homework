@@ -7,33 +7,18 @@ export let comments = [];
 export function setComments(data) {
   comments = data
 }
+export const appEl = document.getElementById('app');
+fetchLoading(appEl);
+console.log(comments)
 const startApp = () => {
-  const appEl = document.getElementById('app');
-
-  const appHtml = `
-    <div class = "container">  
-    <ul id="comment-list" class="comments">
-      <div id="loader" style = "
-      display: none;
-      text-align: center;
-      font-size: 18px;
-      font-weight:bold;
-      margin: 20px 0;
-      ">Загрузка комментариев...</div>
-    </ul>  
-      </div>`
-        
-      
-    appEl.innerHTML = appHtml;
 
 
-    fetchLoading();
     console.log(comments)
-    // const buttonElement = document.getElementById("add-button");
-    // const listElement = document.getElementById("comment-list");
-    // const nameInputElement = document.getElementById("add-name");
-    // const commentInput = document.getElementById("add-text");
-    // let likeValue = document.getElementById('likesCounter');
+    const buttonElement = document.getElementById("add-button");
+    const listElement = document.getElementById("comment-list");
+    const nameInputElement = document.getElementById("add-name");
+    const commentInput = document.getElementById("add-text");
+    let likeValue = document.getElementById('likesCounter');
 
 
     

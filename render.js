@@ -1,3 +1,5 @@
+// кусочки кода чтоб не потерять
+
 // import {initCommentAnswers, initLikesButtonListeners} from "./main.js";
 
 // const listElement = document.getElementById("comment-list");
@@ -32,52 +34,52 @@
 //       </ul>
 //       <div id="loader">Загрузка комментариев...</div>
 //       ${usersHTML}
-//         <div class="add-form" >
-//           <input
-//             id="add-login"
-//             type="text"
-//             class="add-form-name"
-//             placeholder="Логин"
-//             style ='width:510px;'
-//             value=""
-//           />   
-//           <br>     
-//           <input
-//             id="add-password"
-//             type="password"
-//             class="add-form-name"
-//             placeholder="Пароль"
-//             style ='width:510px;'
-//             value=""
-//           />
-//           <div class="add-form-row">
-//             <button id="login-button" style ='width:556px;' class="add-form-button">Войти</button>
-//           </div>
-//           <div class="add-form-row">
-//             <button id="login-button" style ='width:556px;' class="add-form-button">Зарегистрироваться</button>
-//           </div>
-//         </div>
+        // <div class="add-form" >
+        //   <input
+        //     id="add-login"
+        //     type="text"
+        //     class="add-form-name"
+        //     placeholder="Логин"
+        //     style ='width:510px;'
+        //     value=""
+        //   />   
+        //   <br>     
+        //   <input
+        //     id="add-password"
+        //     type="password"
+        //     class="add-form-name"
+        //     placeholder="Пароль"
+        //     style ='width:510px;'
+        //     value=""
+        //   />
+        //   <div class="add-form-row">
+        //     <button id="login-button" style ='width:556px;' class="add-form-button">Войти</button>
+        //   </div>
+        //   <div class="add-form-row">
+        //     <button id="login-button" style ='width:556px;' class="add-form-button">Зарегистрироваться</button>
+        //   </div>
+        // </div>
 
-//         <div class="add-form" >
-//           <input
-//             id="add-name"
-//             type="text"
-//             class="add-form-name"
-//             placeholder="Введите ваше имя"
-//             value=""
-//           />
-//           <textarea
-//             id="add-text"
-//             type="textarea"
-//             class="add-form-text"
-//             placeholder="Введите ваш коментарий"
-//             rows="4"
-//             value=""
-//           ></textarea>
-//           <div class="add-form-row">
-//             <button id="add-button" class="add-form-button">Написать</button>
-//           </div>
-//         </div>
+        // <div class="add-form" >
+        //   <input
+        //     id="add-name"
+        //     type="text"
+        //     class="add-form-name"
+        //     placeholder="Введите ваше имя"
+        //     value=""
+        //   />
+        //   <textarea
+        //     id="add-text"
+        //     type="textarea"
+        //     class="add-form-text"
+        //     placeholder="Введите ваш коментарий"
+        //     rows="4"
+        //     value=""
+        //   ></textarea>
+        //   <div class="add-form-row">
+        //     <button id="add-button" class="add-form-button">Написать</button>
+        //   </div>
+        // </div>
 //       </div>`
       
 //     listElement.innerHTML = usersHTML;

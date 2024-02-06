@@ -3,7 +3,8 @@ import {getComments} from "./api.js";
 import {renderComments} from "./renderComments.js"
 import {comments} from "./main.js"
 
-export function  fetchLoading() {
+
+export function  fetchLoading(appEl) {
 
     // const loader = document.getElementById('loader');
     // loader.style.display = 'block';
@@ -29,7 +30,7 @@ export function  fetchLoading() {
         }
       })
       setComments(appComments);
-      renderComments(appComments);
+      renderComments(appComments, appEl, false);
       console.log(comments)
     })
     // .then((data) => {
