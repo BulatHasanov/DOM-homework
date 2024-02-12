@@ -49,7 +49,7 @@ export function renderComments(comments, appEl, user) {
             type="text"
             class="add-form-name"
             placeholder="Введите ваше имя"
-            value=""
+            value=" ${user.name}" disabled
           />
           <textarea
             id="add-text"
@@ -74,10 +74,9 @@ export function renderComments(comments, appEl, user) {
       appEl.innerHTML = appHtml;
 
       const authLink = document.querySelector("#go-to-login");
-      console.log(authLink)
+
       if(authLink) {
         authLink.addEventListener("click", () => {
-          console.log(authLink);
           renderLogin(comments, appEl);
         })
       } else {

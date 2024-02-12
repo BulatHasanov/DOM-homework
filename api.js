@@ -26,16 +26,20 @@ export function fetchLogin(login, password) {
   })
     .then((response) => {
       return response.json();
+      
     })
 }
 
-export function postComment({name, text}) {
+export function postComment({name, text, token}) {
     return fetch(host, {
         method: "POST", 
         body: JSON.stringify({
           name: name,
           text: text,
-        }) 
+        }), 
+        headers:{
+        Authorization: `Bearer ${token}`,
+        }
       })
       .then((response) => { 
         if(response.status === 201) {
