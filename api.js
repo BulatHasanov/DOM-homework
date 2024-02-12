@@ -29,16 +29,12 @@ export function fetchLogin(login, password) {
     })
 }
 
-export function postComment({name, date, text, likes, isLiked, forceError }) {
+export function postComment({name, text}) {
     return fetch(host, {
         method: "POST", 
         body: JSON.stringify({
           name: name,
-          date: date,
           text: text,
-          likes: likes,
-          isLiked: isLiked, 
-          forceError: forceError,
         }) 
       })
       .then((response) => { 

@@ -6,11 +6,11 @@ export function addFormRender() {
 }
 
 export const renderLogin = (comments, appEl) => {
-    appEl = `
+    appEl.innerHTML = `
         <div class="container">
             <div class="add-form" >
             <input
-                id="add-login"
+                id="login"
                 type="text"
                 class="add-form-name"
                 placeholder="Логин"
@@ -19,7 +19,7 @@ export const renderLogin = (comments, appEl) => {
             />   
             <br>     
             <input
-                id="add-password"
+                id="password"
                 type="password"
                 class="add-form-name"
                 placeholder="Пароль"
@@ -27,7 +27,7 @@ export const renderLogin = (comments, appEl) => {
                 value=""
             />
             <div class="add-form-row">
-                <button id="login-button" style ='width:556px;' class="add-form-button">Войти</button>
+                <button id="auth-button" style ='width:556px;' class="add-form-button">Войти</button>
             </div>
             <div class="add-form-row">
                 <button id="login-button" style ='width:556px;' class="add-form-button">Зарегистрироваться</button>
@@ -39,7 +39,7 @@ export const renderLogin = (comments, appEl) => {
         const login = document.getElementById("login").value;
         const password = document.getElementById("password").value;
         fetchLogin(login, password).then((response) => {
-            renderComments(isInitiaLoading, comments, app, isPosting, response.user);
+            renderComments(comments, appEl,  response.user);
         });
     });
 };

@@ -77,27 +77,27 @@ const startApp = () => {
     //   } else {
     //     buttonElement.disabled = true;
     //     buttonElement.textContent = 'Подождите';
-    //     const fetchPromise = postComment({
-    //       name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-    //       date: new Date().toLocaleString(),
-    //       text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
-    //       likes: '',
-    //       isLiked: false, 
-    //       forceError: true,
-    //     }).then((responseData) => {
-    //         return fetchLoading();
-    //     })
-    //     .then((data) => {
-    //       buttonElement.disabled = false;
-    //       buttonElement.textContent = 'Написать';
-    //       nameInputElement.value = '';
-    //       commentInput.value = '';
-    //     })
-    //     .catch((error) => {
-    //       handleFetchError(error);
-    //       buttonElement.disabled = false;
-    //       buttonElement.textContent = 'Написать';
-    //     })
+        // const fetchPromise = postComment({
+        //   name: nameInputElement.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+        //   date: new Date().toLocaleString(),
+        //   text: commentInput.value.replaceAll("<", "&lt").replaceAll(">", "&gt"),
+        //   likes: '',
+        //   isLiked: false, 
+        //   forceError: true,
+        // }).then((responseData) => {
+        //     return fetchLoading();
+        // })
+        // .then((data) => {
+        //   buttonElement.disabled = false;
+        //   buttonElement.textContent = 'Написать';
+        //   nameInputElement.value = '';
+        //   commentInput.value = '';
+        // })
+        // .catch((error) => {
+        //   handleFetchError(error);
+        //   buttonElement.disabled = false;
+        //   buttonElement.textContent = 'Написать';
+        // })
     //   };   
     // })    
     

@@ -1,4 +1,5 @@
 import { renderLogin } from "./addFormRender.js";
+import { initPostButton } from "./initPostComment.js";
 
 
 export function renderComments(comments, appEl, user) {
@@ -70,16 +71,19 @@ export function renderComments(comments, appEl, user) {
         </div> `
       }
       </div>`
-          
+      appEl.innerHTML = appHtml;
+
       const authLink = document.querySelector("#go-to-login");
       console.log(authLink)
       if(authLink) {
         authLink.addEventListener("click", () => {
           console.log(authLink);
-          renderLogin();
+          renderLogin(comments, appEl);
         })
+      } else {
+        initPostButton()
       }
 
 
-    appEl.innerHTML = appHtml;
+    
 }

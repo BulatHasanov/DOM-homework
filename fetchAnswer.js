@@ -26,11 +26,10 @@ export function  fetchLoading(appEl) {
           text: comment.text,
           likes: comment.likes,
           isLiked: false,
-          forceError: true,
         }
       })
       setComments(appComments);
-      renderComments(appComments, appEl, false);
+      renderComments(appComments, appEl);
       console.log(comments)
     })
     // .then((data) => {
