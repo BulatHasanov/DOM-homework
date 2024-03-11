@@ -1,3 +1,5 @@
+import { fetchLoading } from "./fetchAnswer.js";
+import { appEl } from "./main.js";
 
 const host = "https://wedev-api.sky.pro/api/v1/bulat-khasanov/comments";
 const loginHost = "https://wedev-api.sky.pro/api/user/login"
@@ -30,7 +32,7 @@ export function fetchLogin(login, password) {
     })
 }
 
-export function postComment({name, text, token}) {
+export function postComment({ name, text, token}) {
     return fetch(host, {
         method: "POST", 
         body: JSON.stringify({
@@ -49,5 +51,8 @@ export function postComment({name, text, token}) {
         } else if (response.status === 500) {
           throw new Error('Сервер упал');
         } 
+      })
+      .then(() => {
+        return fetchLoading(appEl);
       })
 }

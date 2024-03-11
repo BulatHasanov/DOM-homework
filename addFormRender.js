@@ -34,11 +34,13 @@ export const renderLogin = (comments, appEl) => {
             </div>
             </div>
         </div>`;
+
     const authButton = document.getElementById("auth-button");
     authButton.addEventListener("click", () => {
         const login = document.getElementById("login").value;
         const password = document.getElementById("password").value;
         fetchLogin(login, password).then((response) => {
+                localStorage.setItem(login, password);
             renderComments(comments, appEl,  response.user);
         });
     });
