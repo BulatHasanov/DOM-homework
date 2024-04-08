@@ -1,23 +1,11 @@
 import { setComments } from "./main.js";
 import {getComments} from "./api.js";
 import {renderComments} from "./renderComments.js"
-import {comments} from "./main.js"
+import { isInitiaLoading } from "./main.js";
+
+export function  fetchLoading(appEl,isInitiaLoading) {
 
 
-export function  fetchLoading(appEl) {
-
-    // const loader = document.getElementById('loader');
-    // loader.style.display = 'block';
-    // buttonElement.disabled = true;
-    // buttonElement.textContent = 'Подождите';
-  
-    // nameInputElement.disabled = true;
-    // commentInput.disabled = true;
-  
-    // if (!isOnline) {
-    //   alert("Отсутствует интернет. Пожалуйста, проверьте ваше соединение и повторите попытку.");
-    //   return;
-    //}
     getComments().then((responseData) => {
       const appComments = responseData.comments.map((comment) => {
         return {
@@ -28,21 +16,9 @@ export function  fetchLoading(appEl) {
           isLiked: false,
         }
       })
-      setComments(appComments);
-      renderComments(appComments, appEl);
-      console.log(comments)
+        setComments(appComments);
+        isInitiaLoading = false;
+        renderComments(appComments, appEl);
     })
-    // .then((data) => {
-    //   loader.style.display = 'none';
-    //   nameInputElement.disabled = false;
-    //   commentInput.disabled = false;
-    //   buttonElement.disabled = false;
-    //   buttonElement.textContent = 'Написать'; 
-    //   startApp({comments});
-    // })
-    // .catch((error) => {
-    //     handleFetchError(error);
-    //     buttonElement.disabled = false;
-    //     buttonElement.textContent = 'Написать';
-    //   })
+
   }

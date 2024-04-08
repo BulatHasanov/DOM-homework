@@ -6,9 +6,25 @@ export function addFormRender() {
 }
 
 export const renderLogin = (comments, appEl) => {
-    appEl.innerHTML = `
+    let isLoginMode = true
+
+    const renderForm = () => {
+        appEl.innerHTML = `
         <div class="container">
             <div class="add-form" >
+            ${isLoginMode 
+                ? "" 
+                : `
+                <input
+                    id="name-input"
+                    type="text"
+                    class="add-form-name"
+                    placeholder="Имя"
+                    style ='width:510px;'
+                    value=""
+                />
+                <br>   
+            `}
             <input
                 id="login"
                 type="text"
@@ -27,10 +43,10 @@ export const renderLogin = (comments, appEl) => {
                 value=""
             />
             <div class="add-form-row">
-                <button id="auth-button" style ='width:556px;' class="add-form-button">Войти</button>
+                <button id="auth-button" style ='width:556px;' class="add-form-button">${isLoginMode ? "Войти" : "Зарегестрироваться"}</button>
             </div>
             <div class="add-form-row">
-                <button id="login-button" style ='width:556px;' class="add-form-button">Зарегистрироваться</button>
+                <button id="toggle-button" style ='width:556px;' class="add-form-button">Перейти ${isLoginMode ? "к авторизации" : "к регистрации"}</button>
             </div>
             </div>
         </div>`;
@@ -40,8 +56,32 @@ export const renderLogin = (comments, appEl) => {
         const login = document.getElementById("login").value;
         const password = document.getElementById("password").value;
         fetchLogin(login, password).then((response) => {
-                localStorage.setItem(login, password);
-            renderComments(comments, appEl,  response.user);
+            localStorage.setItem('user', JSON.stringify(response.user));
+            renderComments(comments, appEl);
         });
+
     });
+    
+    document.getElementById('toggle-button').addEventListener('click', ()=> {
+        isLoginMode = !isLoginMode;
+        renderForm()
+    })
+    }
+
+    renderForm();
+
+    // window.onload = function() {
+    //     const loggedInUser = localStorage.getItem('loggedInUser');
+    //     if (loggedInUser) {
+    //         // Автоматически аутентифицируем пользователя
+    //         fetchLogin(loggedInUser, localStorage.getItem(loggedInUser)).then((response) => {
+    //             if (response.success) {
+    //                 renderComments(comments, appEl,  response.user);
+    //             } else {
+    //                 // Обработка ошибки аутентификации
+    //                 alert('Ошибка аутентификации: ' + response.message);
+    //             }
+    //         });
+    //     }
+    // };
 };

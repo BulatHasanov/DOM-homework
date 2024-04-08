@@ -1,15 +1,15 @@
-
-import {getComments, postComment} from "./api.js";
 import { fetchLoading } from "./fetchAnswer.js";
 
-export let comments = [];
 
+export const appEl = document.getElementById('app');
+
+export let comments = [];
+export let isInitiaLoading = true;
 export function setComments(data) {
   comments = data
 }
-export const appEl = document.getElementById('app');
-fetchLoading(appEl);
-console.log(comments)
+
+fetchLoading(appEl)
 // const startApp = () => {
 
 

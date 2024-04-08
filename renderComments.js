@@ -1,13 +1,13 @@
 import { renderLogin } from "./addFormRender.js";
 import { initPostButton } from "./initPostComment.js";
+import { isInitiaLoading } from "./main.js"
 
-
-export function renderComments(comments, appEl, user) {
-
-    const likeButtons = document.querySelectorAll('.like-button');
-    const commentsList = document.getElementById("comment-list")
-    const usersHTML = comments.map((comment, index) => {
-        return `
+export function renderComments(comments, appEl, isInitiaLoading) {
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+  
+  const likeButtons = document.querySelectorAll('.like-button');
+  const usersHTML = comments.map((comment, index) => {
+    return `
           <li data-index="${index}" class="comment">
             <div class="comment-header">
               <div>${comment.name}</div>
@@ -25,24 +25,17 @@ export function renderComments(comments, appEl, user) {
               </div>
             </div>
           </li>`;
-      }).join("");
+  }).join("");
 
 
-      const appHtml = `
+  const appHtml = `
       <div class = "container">  
         <ul id="comment-list" class="comments">
-          <div id="loader" style = "
-          display: none;
-          text-align: center;
-          font-size: 18px;
-          font-weight:bold;
-          margin: 20px 0;
-          ">Загрузка комментариев...</div>
-          ${usersHTML}
+        ${isInitiaLoading ? "<div id='loader'>Загрузка комментариев...</div>" : usersHTML}
         </ul> 
         
-        ${user ? 
-          `
+        ${user ?
+      `
           <div class="add-form" >
           <input
             id="add-name"
@@ -64,25 +57,46 @@ export function renderComments(comments, appEl, user) {
           </div>
         </div>
         `
-        :
-        `
+      :
+      `
         <div class = "form-loading" style="margin-top: 20px">
           Что бы добавить комментарий, <a href='#' id="go-to-login" href='#'>авторизуйтесь</a>
         </div> `
-      }
+    }
       </div>`
-      appEl.innerHTML = appHtml;
+  appEl.innerHTML = appHtml;
 
-      const authLink = document.querySelector("#go-to-login");
+  const authLink = document.querySelector("#go-to-login");
 
-      if(authLink) {
-        authLink.addEventListener("click", () => {
-          renderLogin(comments, appEl);
-        })
+  if (!user) {
+    authLink.addEventListener("click", () => {
+      renderLogin(comments, appEl);
+    })
+  } else {
+    initPostButton()
+  }
+
+  for (const likeButton of likeButtons) {
+    likeButton.addEventListener('click', (event) => {
+      const index = parseInt(likeButton.getAttribute('data-index'));
+      comments[index].isLiked = !comments[index].isLiked;
+
+      if (comments[index].isLiked) {
+        comments[index].likes += 1;
       } else {
-        initPostButton()
+        comments[index].likes -= 1;
       }
-
-
-    
+      event.stopPropagation();
+      renderComments(comments, app)
+    });
+  };
+  for (const comment of document.querySelectorAll("comments")) {
+    comment.addEventListener('click', () => {
+      const text = document.getElementById("add-text");
+      text.value = `
+        ${comments[comment.dataset.index].name}:
+        ${comments[comment.dataset.index].text}
+        `;
+    });
+  };
 }
