@@ -40,6 +40,33 @@ export function fetchLogin(login, password) {
     })
 
 }
+
+export function registerUser(login, password, name) {
+  return fetch("https://wedev-api.sky.pro/api/user", {
+    method: 'POST',
+    body: JSON.stringify({
+      login,
+      password,
+      name
+    }),
+  })
+    .then((response) => {
+
+      if (response.ok) {
+        return response.json().then(data => {
+          return data;
+        });
+      } else {
+        throw new Error('Ошибка входа');
+      };
+    })
+    .catch((error) => {
+      throw error
+    })
+
+}
+
+
 export function postComment({ name, text }) {
   return fetch(host, {
     method: "POST",

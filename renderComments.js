@@ -1,8 +1,8 @@
 import { renderLogin } from "./addFormRender.js";
 import { initPostButton } from "./initPostComment.js";
-import { isInitiaLoading } from "./main.js"
 
-export function renderComments(comments, appEl, isInitiaLoading) {
+
+export function renderComments(comments, appEl, isLoading) {
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
   
   const likeButtons = document.querySelectorAll('.like-button');
@@ -31,7 +31,7 @@ export function renderComments(comments, appEl, isInitiaLoading) {
   const appHtml = `
       <div class = "container">  
         <ul id="comment-list" class="comments">
-        ${isInitiaLoading ? "<div id='loader'>Загрузка комментариев...</div>" : usersHTML}
+        ${isLoading ? "<div id='loader'>Загрузка комментариев...</div>" : usersHTML}
         </ul> 
         
         ${user ?

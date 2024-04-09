@@ -1,4 +1,4 @@
-import { fetchLogin } from "./api.js";
+import { fetchLogin, registerUser } from "./api.js";
 import { renderComments } from "./renderComments.js";
 
 export function addFormRender() {
@@ -52,15 +52,29 @@ export const renderLogin = (comments, appEl) => {
         </div>`;
 
     const authButton = document.getElementById("auth-button");
-    authButton.addEventListener("click", () => {
-        const login = document.getElementById("login").value;
-        const password = document.getElementById("password").value;
-        fetchLogin(login, password).then((response) => {
-            localStorage.setItem('user', JSON.stringify(response.user));
-            renderComments(comments, appEl);
+    if (isLoginMode){
+        authButton.addEventListener("click", () => {
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+            fetchLogin(login, password).then((response) => {
+                localStorage.setItem('user', JSON.stringify(response.user));
+                renderComments(comments, appEl);
+            });
+    
         });
+    } else {
+        authButton.addEventListener("click", () => {
+            const login = document.getElementById("login").value;
+            const name = document.getElementById("name-input").value;
+            const password = document.getElementById("password").value;
+            registerUser(login, password, name).then((response) => {
+                localStorage.setItem('user', JSON.stringify(response.user));
+                renderComments(comments, appEl);
+            });
+    
+        });
+    }
 
-    });
     
     document.getElementById('toggle-button').addEventListener('click', ()=> {
         isLoginMode = !isLoginMode;
